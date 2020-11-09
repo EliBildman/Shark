@@ -34,4 +34,19 @@ const hands = {
     ROYAL_FLUSH: 9
 }
 
-module.exports = {suits, types, hands};
+const moves = {
+    FOLD: 0,
+    CALL: 1,
+    RAISE: 2
+}
+
+class Card {
+
+    constructor(type, suit) {
+        this.type = type;
+        this.suit = suit;
+    }
+
+}
+
+module.exports = {suits, types, hands, moves, Card};
