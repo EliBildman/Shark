@@ -18,7 +18,7 @@ class GameState(object):
         if win_prob == None:
             self.win_prob = prob_winning(self.hole, self.known_comm)
         else:
-            self.win_prob = None
+            self.win_prob = win_prob
 
         # print(comm_len, self.comm_len)
 
