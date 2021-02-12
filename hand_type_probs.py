@@ -63,8 +63,8 @@ def prob_winning(hole, comm):
     winning = 0.0
     # losing = 0.0
 
-    print(h_probs)
-    print(o_probs)
+    # print(h_probs)
+    # print(o_probs)
 
     for my_type in h_probs:
         for opp_type in o_probs:

@@ -4,7 +4,7 @@ from pypokerengine.utils.card_utils import gen_cards
 
 class GameState(object):
 
-    def __init__(self, hole, known_comm, n_players, stacks, comm_len = None, pot=None, curr_bet=0, turn=0):
+    def __init__(self, hole, known_comm, n_players, stacks, comm_len = None, pot=None, win_prob = None, curr_bet=0, turn=0):
         self.hole = hole
         self.known_comm = known_comm
         self.n_players = n_players
@@ -14,6 +14,11 @@ class GameState(object):
         self.curr_bet = curr_bet
         self.turn = turn
         self.round_ended = False
+
+        if win_prob == None:
+            self.win_prob = prob_winning(self.hole, self.known_comm)
+        else:
+            self.win_prob = None
 
         # print(comm_len, self.comm_len)
 
@@ -45,14 +50,14 @@ class GameState(object):
         n_pot[self.better] += min(self.curr_bet, self.stacks[self.better])
         n_stacks = self.stacks.copy()
         n_stacks[self.better] -= min(self.curr_bet, self.stacks[self.better])
-        return GameState(self.hole, self.known_comm, self.n_players, n_stacks, self.comm_len, n_pot, self.curr_bet, self.turn + 1)
+        return GameState(self.hole, self.known_comm, self.n_players, n_stacks, self.comm_len, n_pot, self.win_prob, self.curr_bet, self.turn + 1)
 
     def _get_raise(self, n):
         n_pot = self.pot.copy()
         n_pot[self.better] += self.curr_bet + n
         n_stacks = self.stacks.copy()
         n_stacks[self.better] -= self.curr_bet + n
-        return GameState(self.hole, self.known_comm, self.n_players, n_stacks, self.comm_len, n_pot, self.curr_bet + n, self.turn + 1)
+        return GameState(self.hole, self.known_comm, self.n_players, n_stacks, self.comm_len, n_pot, self.win_prob, self.curr_bet + n, self.turn + 1)
 
     def get_move(self, move):
         pass
@@ -71,7 +76,7 @@ class GameState(object):
 
 
     def get_value(self):
-        p_winning = prob_winning(self.hole, self.known_comm)
+        p_winning = self.win_prob #prob_winning(self.hole, self.known_comm)
         return ValueState(p_winning * min(self.pot[0], self.pot[1]) - (1 - p_winning) * min(self.pot[0], self.pot[1])) 
 
     def __str__(self):
