@@ -1,5 +1,19 @@
+import networkx as nx 
+import matplotlib.pyplot as plt 
+   
 
-a = 5
+# Driver code
+conns = [('a', 'b'), ('b', 'c')]
 
-if a is a:
-    print('yes')
+G = nx.DiGraph()
+
+for c in conns:
+    for n in c:
+        G.add_node(n)
+    G.add_edge(*c, color='red')
+    
+        
+
+nx.draw_networkx(G, node_color='white')
+plt.show()
+
