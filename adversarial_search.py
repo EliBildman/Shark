@@ -3,7 +3,12 @@ from pypokerengine.utils.card_utils import gen_cards
 
 MAX_DEPTH = 15
 
+nodes_explored = 0
+
 def search_value(state, dir, depth=0):
+
+    global nodes_explored
+    nodes_explored += 1
 
     if type(state) == ValueState:
         return state.value
@@ -34,6 +39,9 @@ moves = s.gen_next_states()
 
 for m in moves:
     print(m, search_value(moves[m], 'MIN'))
+
+# print(nodes_explored)
+
 
 # print(search_value(s, 'MAX'))
 
