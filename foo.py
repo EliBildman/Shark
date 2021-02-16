@@ -1,19 +1,15 @@
-import networkx as nx 
-import matplotlib.pyplot as plt 
-   
+from csv import reader
 
-# Driver code
-conns = [('a', 'b'), ('b', 'c')]
+odds = []
 
-G = nx.DiGraph()
+with open('opening_odds.csv') as f:
+    r = reader(f)
+    i = -1
+    for row in r:
+        odds.append([])
+        i += 1
+        for n in row:
+            odds[i].append(n)
 
-for c in conns:
-    for n in c:
-        G.add_node(n)
-    G.add_edge(*c, color='red')
-    
-        
 
-nx.draw_networkx(G, node_color='white')
-plt.show()
-
+print(odds)

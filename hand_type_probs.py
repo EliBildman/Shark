@@ -61,10 +61,6 @@ def prob_winning(hole, comm):
     ranks = {'HIGHCARD': 0, 'ONEPAIR': 1, 'TWOPAIR': 2, 'THREECARD': 3, 'STRAIGHT': 4, 'FLASH': 5, 'FULLHOUSE': 6, 'FOURCARD': 7, 'STRAIGHTFLASH': 8}
 
     winning = 0.0
-    # losing = 0.0
-
-    # print(h_probs)
-    # print(o_probs)
 
     for my_type in h_probs:
         for opp_type in o_probs:
@@ -72,8 +68,6 @@ def prob_winning(hole, comm):
                 winning += h_probs[my_type] * o_probs[opp_type]
             elif ranks[my_type] == ranks[opp_type]:
                 winning += (h_probs[my_type] * o_probs[opp_type]) / 2
-            # else:
-            #     losing += h_probs[my_type] * o_probs[opp_type]
 
     return winning
     

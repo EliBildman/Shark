@@ -22,11 +22,12 @@ class GameState(object):
 
         # print(comm_len, self.comm_len)
 
+
         if self._check_round_over():
             curr_bet = 0 #eventually do something with comm here
             self.comm_len += 1
             self.turn = 0
-            if self.comm_len > 5:
+            if self.comm_len > 5 or 0 in self.stacks: #needc to genrealize for >2 players
                 self.round_ended = True
 
         self.better = turn % n_players
@@ -70,6 +71,7 @@ class GameState(object):
 
         if self.stacks[self.better] > self.curr_bet:
             states["MIN_RAISE"] = self._get_raise(1)
+            states["MID_RAISE"] = self._get_raise((self.stacks[self.better] - self.curr_bet) / 2)
             states["MAX_RAISE"] = self._get_raise(self.stacks[self.better] - self.curr_bet)
         return states
         
@@ -80,7 +82,8 @@ class GameState(object):
         return ValueState(p_winning * min(self.pot[0], self.pot[1]) - (1 - p_winning) * min(self.pot[0], self.pot[1])) 
 
     def __str__(self):
-        return "GAMESTATE -- Pot: " + str(self.pot) + ", Stacks: " + str(self.stacks) + ", CurrBet: " + str(self.curr_bet) + ", Better: " + str(self.better) + " CommLen:" + str(self.comm_len)
+        return 'State'
+        # return "GAMESTATE -- Pot: " + str(self.pot) + ", Stacks: " + str(self.stacks) + ", CurrBet: " + str(self.curr_bet) + ", Better: " + str(self.better) + " CommLen:" + str(self.comm_len)
 
 
 class ValueState(object):
