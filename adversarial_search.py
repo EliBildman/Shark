@@ -31,12 +31,12 @@ def search_value(state, dir, depth=0, move='Start'):
 
 
 
-hole = gen_cards(['SA', 'DA'])
-comm = gen_cards(['CA', 'HA', 'CK'])
+# hole = gen_cards(['SA', 'DA'])
+# comm = gen_cards(['CA', 'HA', 'CK'])
 
-s = GameState(hole, comm, 2, [100, 100], pot=[0,0], curr_bet=5)
+# s = GameState(hole, comm, 2, [100, 100], pot=[0,0], curr_bet=5)
 
-print(search_value(state=s, dir='MAX'))
+# print(search_value(state=s, dir='MAX'))
 
 # vs.make_animation(delay=0.2)
 

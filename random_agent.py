@@ -30,9 +30,9 @@ class RandomAgent(BasePokerPlayer):
         pass
 
 
-from pypokerengine.api.game import setup_config, start_poker
+# from pypokerengine.api.game import setup_config, start_poker
 
-config = setup_config(max_round=10, initial_stack=100, small_blind_amount=5)
-config.register_player(name="p1", algorithm=RandomAgent())
-config.register_player(name="p2", algorithm=RandomAgent())
-game_result = start_poker(config, verbose=1)
+# config = setup_config(max_round=10, initial_stack=100, small_blind_amount=5)
+# config.register_player(name="p1", algorithm=RandomAgent())
+# config.register_player(name="p2", algorithm=RandomAgent())
+# game_result = start_poker(config, verbose=1)

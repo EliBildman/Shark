@@ -27,7 +27,7 @@ def get_odds(hole):
     else:
         return float(odds[ get_ind(hole[0]) ][ get_ind(hole[1]) ])
 
-x = gen_cards(['SQ', 'SJ'])
+# x = gen_cards(['SQ', 'SJ'])
 
-print(get_odds(x))
+# print(get_odds(x))
 

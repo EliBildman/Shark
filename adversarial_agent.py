@@ -15,39 +15,50 @@ class AdversarialAgent(BasePokerPlayer):
 
     def declare_action(self, valid_actions, hole_card, round_state):
         hole = gen_cards(hole_card)
+        # print(len(round_state['community_card']))
         if len(round_state['community_card']) > 0:
             comm = gen_cards(round_state['community_card'])
-            s = GameState(hole, comm, 2, list(seat.stack for seat in seats))
+            s = GameState(hole, comm, 2, list(seat['stack'] for seat in round_state['seats']))
             best_move = search_value(s, 'MAX')
-            if best_move == 'FOLD':
-                return self._get_action(valid_actions, 'fold')
-            elif best_move == 'CALL':
-                return self._get_action(valid_actions, 'call')
-            elif best_move == 'MIN_RAISE':
-                return self._get_action(valid_actions, 'raise', level='min')
-            elif best_move == 'MID_RAISE':
-                return self._get_action(valid_actions, 'raise', level='mid')
-            elif best_move == 'MAX_RAISE':
-                return self._get_action(valid_actions, 'raise', level='max')
+            # print(best_move)
+            return self._translate_action(valid_actions, best_move[1])
         else:
             dub_odds = get_odds(hole)
             if dub_odds > 0.5:
                 return self._get_action(valid_actions, 'call')
             else:
                 return self._get_action(valid_actions, 'fold')
+    
+    def _translate_action(self, valid_actions, act):
+        if act == 'FOLD':
+            return self._get_action(valid_actions, 'fold')
+        elif act == 'CALL':
+            return self._get_action(valid_actions, 'call')
+        elif act == 'MIN_RAISE':
+            return self._get_action(valid_actions, 'raise', 'min')
+        elif act == 'MID_RAISE':
+            return self._get_action(valid_actions, 'raise', 'mid')
+        elif act == 'MAX_RAISE':
+            return self._get_action(valid_actions, 'raise', 'max')
+        else:
+            print("INVALID ACTION:", act)
 
     def _get_action(self, valid_actions, act, level = None):
-        for a in valid_actions:
-            if a['action'] == 'act':
-                if level == None:
-                    return a['action'], a['amount']
-                else:
-                    if level == 'MIN':
-                        return a['action'], a['amount']['min']
-                    elif level == 'MID':
-                        return a['action'], (a['amount']['min'] + a['amount']['max']) / 2 
-                    elif level == 'MAX':
-                        return a['action'], a['amount']['max']
+        a_list = list(filter(lambda a: a['action'] == act, valid_actions))
+
+        if len(a_list) == 0:
+            print('INVALID ACTION:', act)
+        a = a_list[0]
+
+        if level is None:
+            return a['action'], a['amount']
+        else:
+            if level == 'min':
+                return a['action'], a['amount']['min']
+            elif level == 'mid':
+                return a['action'], (a['amount']['min'] + a['amount']['max']) / 2
+            elif level == 'max':
+                return a['action'], a['amount']['max']
 
 
     def receive_game_start_message(self, game_info):
@@ -66,8 +77,9 @@ class AdversarialAgent(BasePokerPlayer):
         pass
 
 
-
-config = setup_config(max_round=10, initial_stack=100, small_blind_amount=5)
-config.register_player(name="p1", algorithm=AdversarialAgent())
-config.register_player(name="p2", algorithm=RandomAgent())
-game_result = start_poker(config, verbose=0)
+if __name__ == '__main__':
+    config = setup_config(max_round=10, initial_stack=100, small_blind_amount=5)
+    config.register_player(name="p1", algorithm=AdversarialAgent())
+    config.register_player(name="p2", algorithm=RandomAgent())
+    game_result = start_poker(config, verbose=0)
+    print(game_result)

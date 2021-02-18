@@ -1,15 +1,3 @@
-from csv import reader
+x = [1, 2, 3]
 
-odds = []
-
-with open('opening_odds.csv') as f:
-    r = reader(f)
-    i = -1
-    for row in r:
-        odds.append([])
-        i += 1
-        for n in row:
-            odds[i].append(n)
-
-
-print(odds)
+print(list(filter(lambda x: x == 1, x))[0])
