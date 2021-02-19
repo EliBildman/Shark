@@ -1,10 +1,16 @@
 from random_agent import RandomAgent
 from adversarial_agent import AdversarialAgent
+from honest_agent import HonestAgent
+from call_agent import CallAgent
+
 from pypokerengine.api.game import setup_config, start_poker
 
 def test_winrate(p1, p2, num_tests, num_rounds = 10, init_stack = 100, small_blind = 5):
+    print('Working...')
     games = []
-    for _ in range(num_tests):
+    for i in range(num_tests):
+        if int(i / num_tests * 10) - int((i - 1) / num_tests * 10) > 0:
+            print(int(i / num_tests * 100), '% completed')
         config = setup_config(max_round=num_rounds, initial_stack=init_stack, small_blind_amount=small_blind)
         config.register_player(name="p1", algorithm=p1())
         config.register_player(name="p2", algorithm=p2())
@@ -30,4 +36,4 @@ def test_winrate(p1, p2, num_tests, num_rounds = 10, init_stack = 100, small_bli
 
 
 if __name__ == '__main__':
-    test_winrate(AdversarialAgent, RandomAgent, 100)
+    test_winrate(RandomAgent, CallAgent, 10)

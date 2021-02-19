@@ -1,3 +1,5 @@
-x = [1, 2, 3]
+num_tests = 666666
 
-print(list(filter(lambda x: x == 1, x))[0])
+for i in range(num_tests):
+        if int(i / num_tests * 10) - int((i - 1) / num_tests * 10) > 0:
+            print(int(i / num_tests * 100), '% completed')

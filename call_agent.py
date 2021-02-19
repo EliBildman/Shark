@@ -1,6 +1,6 @@
 from pypokerengine.players import BasePokerPlayer
 
-class FishPlayer(BasePokerPlayer):  # Do not forget to make parent class as "BasePokerPlayer"
+class CallAgent(BasePokerPlayer):  # Do not forget to make parent class as "BasePokerPlayer"
 
     #  we define the logic to make an action through this method. (so this method would be the core of your AI)
     def declare_action(self, valid_actions, hole_card, round_state):
