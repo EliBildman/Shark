@@ -5,6 +5,10 @@ from call_agent import CallAgent
 
 from pypokerengine.api.game import setup_config, start_poker
 
+#try to look at money advantage instead --- maybe round to round with an emulaor
+#reinforment learning!!!
+
+
 def test_winrate(p1, p2, num_tests, num_rounds = 10, init_stack = 100, small_blind = 5):
     print('Working...')
     games = []
