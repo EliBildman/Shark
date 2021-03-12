@@ -1,7 +1,7 @@
 from simple_game_state import GameState, ValueState
 from pypokerengine.utils.card_utils import gen_cards
 
-from visualiser.visualiser import Visualiser as vs
+# from visualiser.visualiser import Visualiser as vs
 
 MAX_DEPTH = 15
 

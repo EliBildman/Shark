@@ -5,8 +5,12 @@ moves = ['R', 'P', 'S']
 
 def calculate_value(player, opponent):
     r = ((player - opponent + 1) % 3 - 1)
-    if player == 1 and r == 1:
-        return 10
+    if player == 0:
+        return 0
+    if player == 1:
+        return 0
+    if player == 2:
+        return 100
     return r
 
 
@@ -61,4 +65,4 @@ def train_rps(rounds, start_strats):
 
 
 
-train_rps(100000, ( numpy.array([0.33, 0.33, 0.34]) , numpy.array([0.33, 0.33, 0.34]) ))
+train_rps(100000, ( numpy.array([1, 0, 0]) , numpy.array([0, 1, 0]) ))
