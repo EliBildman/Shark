@@ -1,1 +1,3 @@
-print([1, 2] == [1, 1])
+
+x = input('hello: ')
+print(x == 'a')

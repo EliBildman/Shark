@@ -82,7 +82,7 @@ game_tree = state()
 
 def play_khun_round(p1, p2):
 
-    game = state()
+    game = game_tree
 
     while not game.is_terminal():
 
@@ -92,20 +92,51 @@ def play_khun_round(p1, p2):
         else:
 
             if game.player == 0:
+                print('--- Player 1 turn ---')
                 move = p1.get_move(info_for(0, game))
                 print('Player 1 plays:', move)
             else:
+                print('--- Player 2 turn ---')
                 move = p2.get_move(info_for(1, game))
                 print('Player 2 plays:', move)
 
             game = game.get_move(move)
 
-    print('final value:', game.get_value())
+    v = game.get_value()
 
-    p1.take_ending(game)
-    p2.take_ending(game)
+    print('Hands -> p1:', game.hands[0], 'p2:', game.hands[1])
+    print('Values -> p1:', v, 'p2:', -v)
+
+    return v
+
+
+def play_game(p1, p2, n_rounds, init_cash):
+
+    stacks = [init_cash, init_cash]
+
+    for i in range(n_rounds):
+        print('--- ROUND', i + 1, '---')
+        print('MONEY -> p1:', stacks[0], 'p2:', stacks[1])
+        v = play_khun_round(p1, p2)
+        stacks[0] += v
+        stacks[1] -= v
+
+        if 0 in stacks:
+            break
+    
+    print('Final stacks -> p1', stacks[0], 'p2', stacks[1])
+
 
 #--------------------------------------------------------------------
+
+class HumanPlayer():
+
+    def get_move(self, info):
+        print("Info:", info)
+        return input("What is your move? [PASS, BET] : ")
+        
+
+#-------------------------------------------------------------------
 
 regret_sums= [
     {},
@@ -164,7 +195,7 @@ def prob_for_move(state, player, move, profile):
     infoset = get_info_set_by_state(player, state)
     
     if infoset not in profile:
-        profile[infoset] = default_strat.copy()
+        return 0.5
     
     return profile[infoset][move]
     
@@ -175,25 +206,27 @@ class CFRPlayer():
     def __init__(self, player_num):
         self.num = player_num
 
+    def __str__(self):
+        return "PLAYER -> num: " + str(self.num)
+
     def get_move(self, info):
-
-        infoset = get_info_set_by_state(info, self.num)
+        infoset = str(info['hand']) + str(info['history'])
         dist = strat_profile[self.num][infoset]
-        return rand.choice( list(dist.keys()), list(dist.values()) )
+        return rand.choice( list(dist.keys()), p=list(dist.values()) )
 
-    def take_ending(self, state):
-        pass
+    def history_prob(self, hands, his, ignore_self = False, sub_strat = None, inc_deal = True, start_his = []):
 
-    def history_prob(self, hands, his, ignore_self = False, sub_strat = None):
+        my_profile = strat_profile[self.num] if sub_strat is None else subbed_strategy(self.num, sub_strat[0], sub_strat[1])
+        opp_profile = strat_profile[ 1 if self.num == 0 else 0 ]
 
-        profile = strat_profile[self.num] if sub_strat is None else subbed_strategy(self.num, sub_strat[0], sub_strat[1])
+        # print(profile["0['PASS', 'BET']"])
 
-        p = 1/6
-        s = get_state_by_hands(hands)
-        for i in range(len(his)):
+        p = 1/6 if inc_deal else 1
+        s = get_state_by_history(start_his, hands)
+        for i in range(len(start_his), len(his)):
 
             if i % 2 != self.num or not ignore_self:
-                p *= prob_for_move(s, s.player, his[i], profile)
+                p *= prob_for_move(s, s.player, his[i], my_profile if s.player == self.num else opp_profile)
             s = s.get_move(his[i])
 
         return p
@@ -214,15 +247,11 @@ class CFRPlayer():
 
         s = 0
 
-        cf_reach_prob = self.history_prob(hands, his, ignore_self=True, sub_strat=sub_strat)
-        reach_prob = self.history_prob(hands, his, ignore_self=False, sub_strat=sub_strat)
+        cf_reach_prob = self.history_prob(hands, his, ignore_self=True, sub_strat=None)
 
         for term in possible_terms:
-            term_prob = self.history_prob(hands, term[0], ignore_self=False, sub_strat=sub_strat)
-            if term_prob != 0:
-                end_reach_prob = term_prob / reach_prob #not sure about this, written pi^sigma(h, z) look into further
-            else:
-                end_reach_prob = 0
+            end_reach_prob = self.history_prob(hands, term[0], ignore_self=False, sub_strat=sub_strat, start_his=his, inc_deal=False)
+            # print(sub_strat, term, end_reach_prob)
             util = term[1] * (-1 if self.num == 1 else 1)
             s += cf_reach_prob * end_reach_prob * util
 
@@ -233,6 +262,7 @@ class CFRPlayer():
         his_state = get_state_by_history(his, hands)
         sub_strat = (get_info_set_by_state(self.num, his_state), action)
 
+        # print( self.cf_value(hands, his, sub_strat = sub_strat) )
         return self.cf_value(hands, his, sub_strat = sub_strat) - self.cf_value(hands, his, sub_strat = None)
 
     def cfr_iset(self, hand, his, action):
@@ -244,13 +274,14 @@ class CFRPlayer():
         for opp_hand in deck:
             if opp_hand != hand:
                 hands[abs(self.num - 1)] = opp_hand
+
                 s += self.cf_regret(hands, his, action)
 
-        
+
         return s
 
-
     def calc_strat(self, hand, his):
+
 
         info_set = get_info_set_by_his(self.num, his, hand) 
 
@@ -279,6 +310,7 @@ class CFRPlayer():
             else:
                 strat[a] = 1 / len(actions)
 
+        # print(self, hand, his, strat)
         return strat
 
 
@@ -291,10 +323,6 @@ def train(n):
     p2 = CFRPlayer(1)
 
     def train_tree(s, player):
-
-        # print(s)
-
-        # print(player.num)
 
         if s.is_terminal():
             return
@@ -316,16 +344,10 @@ def train(n):
             train_tree(game_tree, p2)
 
     
+p1 = HumanPlayer()
+p2 = CFRPlayer(1)
 
-train(100)
-print('p1')
-pprint(regret_sums[0])
-print('p2')
-pprint(regret_sums[1])
+print('Training...')
+train(1000)
 
-# p1 = CFRPlayer(0)
-# p2 = CFRPlayer(1)
-
-# print(p1.cf_regret([1, 0], ['PASS', 'BET'], 'BET'))
-# print(strat_profile)
-# print(p1.cf_regret([1, 0], ['PASS', 'BET'], 'BET'))
+play_game(p1, p2, 10, 10)
