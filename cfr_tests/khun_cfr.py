@@ -350,4 +350,6 @@ p2 = CFRPlayer(1)
 print('Training...')
 train(1000)
 
-play_game(p1, p2, 10, 10)
+pprint(strat_profile[0])
+
+# play_game(p1, p2, 10, 10)

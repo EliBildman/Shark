@@ -1,3 +1,2 @@
-
-x = input('hello: ')
-print(x == 'a')
+from random import randint
+print(randint(0, 5))
