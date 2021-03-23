@@ -6,7 +6,7 @@ import numpy as np
 from itertools import combinations
 from scipy.cluster.vq import vq, kmeans, whiten
 
-N_TESTS = 100
+N_TESTS = 10
 
 #creating abstrction tree
 
@@ -115,20 +115,23 @@ def flop_wrs_given(hole):
         n.get_wr()
 
 
-def collapse(parent, n):
+def collapse(parent, n): #collapses children of parent into n AbstractNodes based on k-means cluster 
 
+    #kmeans cluster
     wrs = [node.get_wr() for node in parent.get_children()]
     whitened = whiten(wrs)
     means, _error = kmeans(whitened, n)
     
     abstracted = [AbstractNatureNode(parent, m) for m in means]
 
+    #transfer children to correct abstract node
     for child in parent.get_children():
         a_node = min(abstracted, key= lambda a: abs(child.get_wr() - a.get_wr()) )
         a_node.p += 1
         for g_child in child.get_children():
             a_node.children.append(g_child)
 
+    #normailze
     s = sum( a.p for a in abstracted )
     for a in abstracted:
         a.p /= s
@@ -159,8 +162,33 @@ def build_postflop_tree(hole, flop):
     # print(len(a))
 
 
+def build_flop_tree():
+
+    root = NatureNode()
+    i = 0
+    for hole in root.get_children():
+        i += 1
+        print( i / 1300 )
+        s = 0
+        for flop in hole.get_children():
+            s += flop.get_wr()
+        hole.wr = s / len(hole.get_children())
+
+    return root
+            
+
+        
+
     
 
-hole = gen_cards(['H2', 'S8'])
-flop = gen_cards(['CA', 'S2', 'HJ'])
-build_postflop_tree(hole, flop)
+
+n = NatureNode()
+i = 0
+
+
+
+# hole = gen_cards(['H2', 'S8'])
+# flop = gen_cards(['CA', 'S2', 'HJ'])
+# build_postflop_tree(hole, flop)
+
+build_flop_tree()
