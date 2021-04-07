@@ -1,2 +1,7 @@
-from random import randint
-print(randint(0, 5))
+
+class A:
+    pass
+
+x = A()
+
+print(type(x))

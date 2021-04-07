@@ -1,2 +1,5 @@
 .vscode/**
 *.png
+*.gif
+largeboy.pem
+out.dictionary
