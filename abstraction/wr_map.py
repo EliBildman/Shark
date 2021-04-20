@@ -2,15 +2,16 @@ import pickle
 from pypokerengine.utils.card_utils import gen_cards, gen_deck, estimate_hole_card_win_rate
 from execution_time import ExecutionTime
 import matplotlib.pyplot as plt
-from nodes import Conn, WRNode
+from nodes import Conn, WRNode, WRNatureNode
 
 e = ExecutionTime()
 
-N_NODES = 21
+N_NODES = 10
 N_LEVELS = 4
 N_TESTS = 1000
 
 NODE_FILE = 'D:/dev/Shark/abstraction/wr_nodes.dic'
+TREE_FILE = 'D:/dev/Shark/abstraction/wr_tree.dic'
 
 
 #creates WRNode map
@@ -29,12 +30,12 @@ def create_wr_map():
 
     return nodes 
 
-def save_nodes(nodes, filename):
+def save(nodes, filename):
     f = open(filename, 'wb')
     pickle.dump(nodes, f)
     f.close()
 
-def load_nodes(filename):
+def load(filename):
     f = open(filename, 'rb')
     nodes = pickle.load(f)
     f.close()
@@ -69,15 +70,28 @@ def sim_nature(nodes):
         curr = _next
         i += 1
 
+#creates 2-player tree out of map, with two maps
+def create_nature_tree(wr_map):
+    def rec_build_tree(node):
+        for child in node.get_children():
+            rec_build_tree(child)
 
-def train(n_itterations):
-    nodes = load_nodes(NODE_FILE)
+    root = WRNatureNode([wr_map, wr_map])
+    save(root, TREE_FILE)
+    return root
+
+
+def train(n_itterations, dump_nodes = False):
+    if not dump_nodes:
+        nodes = load(NODE_FILE)
+    else:
+        nodes = create_wr_map()
     for i in range(n_itterations):
         if i % 100 == 0:
             print(i / n_itterations)
-            save_nodes(nodes, NODE_FILE)
+            save(nodes, NODE_FILE)
         sim_nature(nodes)
-    save_nodes(nodes, NODE_FILE)
+    save(nodes, NODE_FILE)
 
 
 def plot(node):
@@ -86,11 +100,5 @@ def plot(node):
     plt.bar(wrs, ps)
     plt.show()
 
-
-# train(10000)
-
-nodes = load_nodes(NODE_FILE)
-
-# plot(nodes[1][10])
-plot(nodes[3][10])
-
+if __name__ == '__main__':
+    train(100_000, dump_nodes=True)

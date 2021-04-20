@@ -1,7 +1,6 @@
 
-class A:
-    pass
+x = [('a', 1), ('b', 2)]
 
-x = A()
 
-print(type(x))
+for a, b in x:
+    print(a, b)

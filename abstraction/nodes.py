@@ -3,11 +3,7 @@ from itertools import combinations
 import uuid
 from copy import copy, deepcopy
 
-# from pypokerengine.api.em
-
 N_TESTS = 100
-
-
 deck = gen_deck().deck
 
 def all_holes():
@@ -99,6 +95,7 @@ class Conn():
 #nodes to be set in map with N_LEVELS levels of width N_NODES, each level being completely connected to proceeding and succeeding levels
 class WRNode():
 
+    #wr: float
     def __init__(self, wr):
         self.wr = wr
         self.conns = []
@@ -113,7 +110,41 @@ class WRNode():
                 c.inc()
             else:
                 c.dec()
+
+    #returns if this is the bottom row
+    def is_final(self):
+        return len(self.conns) == 0
+
+    #get child nodes as dict with p weights
+    def get_children(self):
+        children = []
+        for c in self.conns:
+            children.append(c.child, c.p())
+        return children
         
+#combines many (2) WRNodes to represent the full effect of a deal on many (2) players
+class WRNatureNode():
+
+    #wr_nodes: [WRNode], children: [WRNatureNode]
+    def __init__(self, wr_nodes):
+        self.p1_wr, self.p2_wr = wr_nodes
+        self.children = []
+
+
+    #get array of (children, p) where p is combined probability of both nature events
+    def get_children(self):
+        if self.children:
+            return self.children
+
+        for p1_c, p1_p in self.p1_wr.get_children():
+            for p2_c, p2_p in self.p2_wr.get_children():
+                self.children.append( (WRNatureNode([p1_c, p2_c]), p1_p * p2_p) )
+
+        return self.children
+
+    def is_final(self):
+        return self.p1_wr.is_final() and self.p2_wr.is_final() 
+
 class AbstractNatureNode():
 
     def __init__(self, parent, wr, p = 0, children = []):
@@ -142,17 +173,12 @@ class GameState():
 
     def opp_player(self):
         return (self.turn + 1) % self.n_players
-            
-
-class EDecisionNode():
-
-    def __init__(self, parent):
-        pass
 
 
 class DecisionNode():
 
     def __init__(self, parent, gamestate, raise_amounts, children = [], round_over = False):
+        self.parent = parent
         self.gamestate = gamestate
         self.children = children[:]
         self.round_over = round_over
@@ -227,3 +253,26 @@ class ValueNode():
 
     def __init__(self, value):
         self.value = value
+
+
+class Move():
+
+    def __init__(self, name, amount = None):
+        self.name = name
+        self.amount = amount
+
+class Action():
+
+    #player: int, move: int
+    def __init__(self, player, move):
+        self.player = player
+        self.move = move
+
+
+class WrInfoSet():
+    
+    #hand_wr: float, his: [Action]
+    def __init__(self, hand_wr, his):
+        self.hand_wr = hand_wr
+        self.his = his
+        self.id = uuid.uuid1()
