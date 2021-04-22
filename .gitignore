@@ -5,4 +5,4 @@ largeboy.pem
 out.dictionary
 ./foo.py
 *.dic
-__pycache__/*
+**/__pycache__/**
