@@ -180,13 +180,13 @@ class GameState():
 
 class DecisionNode():
 
-    def __init__(self, parent, gamestate, raise_amounts, last_move = None, children = [], round_over = False):
+    def __init__(self, parent, gamestate, raise_amounts, last_action = None, children = [], round_over = False):
         self.parent = parent
         self.gamestate = gamestate
         self.children = children[:]
         self.round_over = round_over
         self.raise_amounts = raise_amounts
-        self.last_move = last_move
+        self.last_action = last_action
 
     def check_round_over(self):
         if self.gamestate.turn < self.gamestate.n_players:
@@ -209,15 +209,17 @@ class DecisionNode():
         new_state.stacks[player] -= call_amount
         new_state.turn += 1
 
-        # if call_amount != -0.5:
-        #     print(call_amount)
-
         ends_round = new_state.turn >= new_state.n_players
-        return DecisionNode(self, new_state, self.raise_amounts, round_over= ends_round)
+
+        act = Action(player, Move('call'))
+
+        return DecisionNode(self, new_state, self.raise_amounts, last_action= act, round_over= ends_round)
 
     def _get_fold(self):
+
         v = -self.gamestate.pots[0] if self.gamestate.player() == 0 else self.gamestate.pots[1]
-        return ValueNode(v)
+        act = Action(self.gamestate.player(), Move('fold'))
+        return ValueNode(v, act)
 
     def _get_raise(self, raise_amount): #amount taken in bbs
         
@@ -231,7 +233,10 @@ class DecisionNode():
         new_state.stacks[player] -= call_amount + raise_amount
 
         new_state.turn += 1
-        return DecisionNode(self, new_state, self.raise_amounts)
+
+        act = Action(player, Move('riase', amount= raise_amount))
+
+        return DecisionNode(self, new_state, self.raise_amounts, last_action= act)
 
 
     def get_children(self):
@@ -253,19 +258,21 @@ class DecisionNode():
 
         return self.children
 
-
+#the leaf nodes of the decision tree, wiht deterministic value
 class ValueNode():
 
-    def __init__(self, value):
+    def __init__(self, value, last_move):
+        self.last_move = last_move
         self.value = value
 
-
+#a move made with name and amount info
 class Move():
 
     def __init__(self, name, amount = None):
         self.name = name
         self.amount = amount
 
+#a move made by a player
 class Action():
 
     #player: int, move: int

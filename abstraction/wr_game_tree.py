@@ -27,7 +27,8 @@ class AGameNode():
         self.inner_node = inner_node
         self.children = children[:]
         self.wrs = wrs
-        self.player = -1 if type(inner_node) is WRNatureNode else (inner_node.gamestate.player())
+        self.is_nature = type(inner_node) is WRNatureNode
+        self.player = -1 if self.is_nature else (inner_node.gamestate.player())
         self.is_round_end = type(inner_node) is DecisionNode and inner_node.round_over
         self.is_root = parent is None
         self.history = []
@@ -45,19 +46,20 @@ class AGameNode():
     #gives transition prob to this node from parent
     def t(self):
 
-        if type(self.inner_node) is WRNatureNode:
+        if self.is_nature is WRNatureNode:
             return self.inner_node.t
         
-        elif type(self.inner_node) is DecisionNode:
+        else: #deicsion node
             pass #calculate based on strategy profile of player at parent node, or 1.0 if parent is nature
 
+    #gets move history from last nature to here, TODO: make this go back to root when full tree is being explored
     def get_history(self):
         if self.history:
             return self.history
 
         curr = self
-        while not curr.is_root:
-            self.history.insert(0, curr)
+        while not curr.is_nature:
+            self.history.insert(0, curr.inner_node.last_move)
         
         return self.history
 

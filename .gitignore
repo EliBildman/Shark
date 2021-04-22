@@ -1,8 +1,9 @@
 .vscode/**
-*.png
-*.gif
+**.png
+**.gif
 largeboy.pem
 out.dictionary
 ./foo.py
 *.dic
 **/__pycache__/**
+**/.ipynb_checkpoints/**
