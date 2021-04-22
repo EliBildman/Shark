@@ -115,20 +115,22 @@ class WRNode():
     def is_final(self):
         return len(self.conns) == 0
 
-    #get child nodes as dict with p weights
+    #get child nodes as list of tuples (WR_Node, p)
     def get_children(self):
         children = []
         for c in self.conns:
-            children.append(c.child, c.p())
+            children.append( (c.child, c.p()) )
         return children
         
 #combines many (2) WRNodes to represent the full effect of a deal on many (2) players
 class WRNatureNode():
 
-    #wr_nodes: [WRNode], children: [WRNatureNode]
-    def __init__(self, wr_nodes):
+    #wr_nodes: [WRNode], children: [WRNatureNode], t: float
+    #t is transition prob from last nature state
+    def __init__(self, wr_nodes, t):
         self.p1_wr, self.p2_wr = wr_nodes
         self.children = []
+        self.t = t
 
 
     #get array of (children, p) where p is combined probability of both nature events
@@ -138,10 +140,11 @@ class WRNatureNode():
 
         for p1_c, p1_p in self.p1_wr.get_children():
             for p2_c, p2_p in self.p2_wr.get_children():
-                self.children.append( (WRNatureNode([p1_c, p2_c]), p1_p * p2_p) )
+                self.children.append( WRNatureNode([p1_c, p2_c], p1_p * p2_p) )
 
         return self.children
 
+    #is the end of a round
     def is_final(self):
         return self.p1_wr.is_final() and self.p2_wr.is_final() 
 
@@ -177,12 +180,13 @@ class GameState():
 
 class DecisionNode():
 
-    def __init__(self, parent, gamestate, raise_amounts, children = [], round_over = False):
+    def __init__(self, parent, gamestate, raise_amounts, last_move = None, children = [], round_over = False):
         self.parent = parent
         self.gamestate = gamestate
         self.children = children[:]
         self.round_over = round_over
         self.raise_amounts = raise_amounts
+        self.last_move = last_move
 
     def check_round_over(self):
         if self.gamestate.turn < self.gamestate.n_players:
@@ -236,7 +240,8 @@ class DecisionNode():
             return self.children
 
         if self.round_over:
-            raise Exception('round over')
+            return []
+            # raise Exception('round over')
         
         self.children.append(self._get_fold())
         self.children.append(self._get_call())

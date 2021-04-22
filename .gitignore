@@ -3,3 +3,6 @@
 *.gif
 largeboy.pem
 out.dictionary
+./foo.py
+*.dic
+__pycache__/*

@@ -6,9 +6,9 @@ from nodes import Conn, WRNode, WRNatureNode
 
 e = ExecutionTime()
 
-N_NODES = 10
+N_NODES = 5
 N_LEVELS = 4
-N_TESTS = 1000
+N_TESTS = 10
 
 NODE_FILE = 'D:/dev/Shark/abstraction/wr_nodes.dic'
 TREE_FILE = 'D:/dev/Shark/abstraction/wr_tree.dic'
@@ -72,11 +72,15 @@ def sim_nature(nodes):
 
 #creates 2-player tree out of map, with two maps
 def create_nature_tree(wr_map):
+
     def rec_build_tree(node):
+        # print(len(node.get_children()), node.is_final)
         for child in node.get_children():
             rec_build_tree(child)
 
-    root = WRNatureNode([wr_map, wr_map])
+    map_s = wr_map[0][0]
+    root = WRNatureNode([map_s, map_s], 1)
+    rec_build_tree(root)
     save(root, TREE_FILE)
     return root
 
@@ -101,4 +105,6 @@ def plot(node):
     plt.show()
 
 if __name__ == '__main__':
-    train(100_000, dump_nodes=True)
+    train(10_000, dump_nodes=True)
+    _map = load(NODE_FILE)
+    create_nature_tree(_map)

@@ -1,9 +1,9 @@
 from nodes import DecisionNode, ValueNode, GameState
 
-RAISE_AMOUNTS = [0.5, 1, 2, 5]
+RAISE_AMOUNTS = [0.5, 1, 5]
 PLAYERS = 2
 BLINDS = [0.5, 1]
-MAX_BET = 6
+MAX_BET = 5
 
 def build_decision_tree():
 
