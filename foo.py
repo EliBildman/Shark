@@ -1,6 +1,5 @@
 
-x = [('a', 1), ('b', 2)]
 
+x = 'a' if 5 < 4 else 'b'
 
-for a, b in x:
-    print(a, b)
+print(x)

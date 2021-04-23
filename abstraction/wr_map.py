@@ -6,18 +6,21 @@ from nodes import Conn, WRNode, WRNatureNode
 
 e = ExecutionTime()
 
-N_NODES = 5
-N_LEVELS = 4
+N_NODES = 2
+N_LEVELS = 5
 N_TESTS = 10
 
-NODE_FILE = 'D:/dev/Shark/abstraction/wr_nodes.dic'
-TREE_FILE = 'D:/dev/Shark/abstraction/wr_tree.dic'
+NODE_FILE = 'D:/dev/Shark/abstraction/caches/wr_nodes.dic'
+TREE_FILE = 'D:/dev/Shark/abstraction/caches/wr_tree.dic'
+
+TEST_NODES = 'D:/dev/Shark/abstraction/caches/t_nodes.dic'
+TEST_TREE = 'D:/dev/Shark/abstraction/caches/t_tree.dic'
 
 
 #creates WRNode map
 def create_wr_map():
     inc = 1 / (N_NODES - 1)
-    nodes = [[WRNode(None)]]
+    nodes = [[WRNode(0.5)]]
     for level in range(1, N_LEVELS + 1):
         nodes.append([])
         
@@ -71,7 +74,7 @@ def sim_nature(nodes):
         i += 1
 
 #creates 2-player tree out of map, with two maps
-def create_nature_tree(wr_map):
+def create_nature_tree(wr_map, save_file):
 
     def rec_build_tree(node):
         # print(len(node.get_children()), node.is_final)
@@ -81,21 +84,21 @@ def create_nature_tree(wr_map):
     map_s = wr_map[0][0]
     root = WRNatureNode([map_s, map_s], 1)
     rec_build_tree(root)
-    save(root, TREE_FILE)
+    save(root, save_file)
     return root
 
 
-def train(n_itterations, dump_nodes = False):
+def train(n_itterations, save_file, dump_nodes = False):
     if not dump_nodes:
-        nodes = load(NODE_FILE)
+        nodes = load(save_file)
     else:
         nodes = create_wr_map()
     for i in range(n_itterations):
         if i % 100 == 0:
             print(i / n_itterations)
-            save(nodes, NODE_FILE)
+            save(nodes, save_file)
         sim_nature(nodes)
-    save(nodes, NODE_FILE)
+    save(nodes, save_file)
 
 
 def plot(node):
@@ -105,6 +108,6 @@ def plot(node):
     plt.show()
 
 if __name__ == '__main__':
-    train(10_000, dump_nodes=True)
-    _map = load(NODE_FILE)
-    create_nature_tree(_map)
+    train(100, TEST_NODES, dump_nodes=True)
+    _map = load(TEST_NODES)
+    create_nature_tree(_map, TEST_TREE)
