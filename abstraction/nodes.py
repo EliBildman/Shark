@@ -261,8 +261,8 @@ class DecisionNode():
 #the leaf nodes of the decision tree, wiht deterministic value
 class ValueNode():
 
-    def __init__(self, value, last_move):
-        self.last_move = last_move
+    def __init__(self, value, last_action):
+        self.last_action = last_action
         self.value = value
 
 #a move made with name and amount info
