@@ -2,7 +2,7 @@ import pickle
 from pypokerengine.utils.card_utils import gen_cards, gen_deck, estimate_hole_card_win_rate
 from execution_time import ExecutionTime
 import matplotlib.pyplot as plt
-from nodes import Conn, WRNode, WRNatureNode
+from WRNodes import Conn, WRNode, WRNatureNode
 
 e = ExecutionTime()
 
@@ -10,11 +10,11 @@ N_NODES = 2
 N_LEVELS = 5
 N_TESTS = 10
 
-NODE_FILE = 'D:/dev/Shark/abstraction/caches/wr_nodes.dic'
-TREE_FILE = 'D:/dev/Shark/abstraction/caches/wr_tree.dic'
+NODE_FILE = 'D:/dev/Shark/cfr/abstraction/caches/wr_nodes.dic'
+TREE_FILE = 'D:/dev/Shark/cfr/abstraction/caches/wr_tree.dic'
 
-TEST_NODES = 'D:/dev/Shark/abstraction/caches/t_nodes.dic'
-TEST_TREE = 'D:/dev/Shark/abstraction/caches/t_tree.dic'
+TEST_NODES = 'D:/dev/Shark/cfr/abstraction/caches/t_nodes.dic'
+TEST_TREE = 'D:/dev/Shark/cfr/abstraction/caches/t_tree.dic'
 
 
 #creates WRNode map

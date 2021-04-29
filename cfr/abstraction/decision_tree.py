@@ -1,4 +1,4 @@
-from nodes import DecisionNode, ValueNode, GameState
+from RoundNodes import DecisionNode, ValueNode, GameState
 
 RAISE_AMOUNTS = [0.5, 1, 5]
 PLAYERS = 2
@@ -17,3 +17,6 @@ def build_decision_tree():
 
     build_children(root)
     return root
+
+if __name__ == '__main__':
+    x = build_decision_tree()
