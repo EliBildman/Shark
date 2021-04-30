@@ -21,6 +21,9 @@ def create_game_tree(n_tree, d_tree, parent = None):
             game_node = AGameNode(parent, d_node, [p1_wr, p2_wr])
             for child in d_node.get_children():
                 game_node.add_child( wrap_d_tree(p1_wr, p2_wr, child, game_node, leaf_children) )
+            
+            game_node.get_info_set() #initilize info_set
+
         else:
             #send back value
             take = d_node.gamestate.pots[0] * (1 if p1_wr > p2_wr else -1) #TODO: estimated EV
@@ -33,11 +36,18 @@ def create_game_tree(n_tree, d_tree, parent = None):
 
         return game_node
 
-    root = AGameNode(parent, n_tree, None)
-    root.add_child( wrap_d_tree(n_tree.p1_wr.wr, n_tree.p2_wr.wr, d_tree, root, n_tree.get_children()) )
+    if n_tree.is_root:
+        root = AGameNode(parent, n_tree, None)
 
-    for c in n_tree.get_children():
-        create_game_tree(c, d_tree, parent = root)
+        for c in n_tree.get_children():
+            root.add_child( create_game_tree(c, d_tree, parent = root) )
+
+    else:
+        root = AGameNode(parent, n_tree, [n_tree.p1_wr.wr, n_tree.p2_wr.wr])
+        root.add_child( wrap_d_tree(n_tree.p1_wr.wr, n_tree.p2_wr.wr, d_tree, root, n_tree.get_children()) )
+
+        for c in n_tree.get_children():
+            create_game_tree(c, d_tree, parent = root)
 
     return root
 

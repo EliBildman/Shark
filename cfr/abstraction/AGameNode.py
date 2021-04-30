@@ -40,8 +40,8 @@ class AGameNode():
         self.history = []
         self.info_set = None
 
-        if self.is_decision:
-            self.get_info_set()
+        # if self.is_decision:
+        #     self.get_info_set()
 
     #get info set containing this node, assumes this is decision node
     def get_info_set(self):
@@ -71,7 +71,7 @@ class AGameNode():
     #gives transition prob to this node from parent
     def t(self):
 
-        if self.is_nature is WRNatureNode:
+        if self.is_nature:
             return self.inner_node.t
         
         else: #deicsion node or value node
@@ -83,17 +83,18 @@ class AGameNode():
             # return p_action(info_set, self.inner_node.last_action)
             #calculate based on strategy profile of player at parent node, or 1.0 if parent is nature
 
-    #gets move history from last nature to here, TODO: make this go back to root when full tree is being explored
+    #gets move history from last nature to here
     def get_history(self):
         if self.history:
             return self.history
 
         curr = self
-        while not curr.parent.is_nature:
+        while not curr.is_root:
             self.history.insert(0, curr)
             curr = curr.parent
         
         return self.history
     
-    def init_strat(self):
-        pass
+    def __str__(self):
+        _type = 'nature' if self.is_nature else ('decision' if self.is_decision else 'value')
+        return 'AGameNode(wrs: ' + str(self.wrs) + ',\ttype: ' + _type + ',\tlast_action: ' + (str(self.inner_node.last_action) if not self.is_nature else 'N/A') + ')'

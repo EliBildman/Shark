@@ -82,7 +82,7 @@ def create_nature_tree(wr_map, save_file):
             rec_build_tree(child)
 
     map_s = wr_map[0][0]
-    root = WRNatureNode([map_s, map_s], 1)
+    root = WRNatureNode([map_s, map_s], 1, is_root= True)
     rec_build_tree(root)
     save(root, save_file)
     return root

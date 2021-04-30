@@ -51,10 +51,11 @@ class WRNatureNode():
 
     #wr_nodes: [WRNode], children: [WRNatureNode], t: float
     #t is transition prob from last nature state
-    def __init__(self, wr_nodes, t):
+    def __init__(self, wr_nodes, t, is_root = False):
         self.p1_wr, self.p2_wr = wr_nodes
         self.children = []
         self.t = t
+        self.is_root = is_root
 
 
     #get array of (children, p) where p is combined probability of both nature events

@@ -86,7 +86,8 @@ class DecisionNode():
 #also has strategy for this iset
 class WRInfoSet():
     
-    #hand_wr: float, his: [Action]
+    #example node is a history that this info set contains
+    #hand_wr: float, example_node: AGameNode
     def __init__(self, example_node):
         self.player = example_node.player
         self.hand_wr = example_node.wrs[example_node.player]
@@ -110,6 +111,10 @@ class WRInfoSet():
             return False
 
         n_his = node.get_history()
+
+        if len(n_his) != len(self.his):
+            return False
+
         for i in range(len(self.his)):
             if self.his[i] != n_his[i]:
                 return False
@@ -122,7 +127,7 @@ class WRInfoSet():
     def _init_strat(self, example_node):
         children = example_node.get_children()
         for child in children:
-            self.strat.append( (child.last_move, 1 / len(children)) )
+            self.strat.append( (child.inner_node.last_action, 1 / len(children)) )
 
 
 class GameState():
@@ -154,6 +159,9 @@ class Move():
         self.name = name
         self.amount = amount
 
+    def __str__(self):
+        return 'Move(name: ' + self.name + ',\tamount: ' + str(self.amount) + ')' 
+
 #a move made by a player
 class Action():
 
@@ -164,3 +172,6 @@ class Action():
 
     def __eq__(self, other):
         return self.player == other.player and self.move.name == other.move.name and self.move.amount == other.move.amount
+
+    def __str__(self):
+        return 'Action(player: ' + str(self.player) + ',\tmove: ' + str(self.move) + ')'
