@@ -7,3 +7,4 @@ out.dictionary
 *.dic
 **/__pycache__/**
 **/.ipynb_checkpoints/**
+foo.py

@@ -41,7 +41,6 @@ def create_game_tree(n_tree, d_tree, parent = None):
 
         for c in n_tree.get_children():
             root.add_child( create_game_tree(c, d_tree, parent = root) )
-
     else:
         root = AGameNode(parent, n_tree, [n_tree.p1_wr.wr, n_tree.p2_wr.wr])
         root.add_child( wrap_d_tree(n_tree.p1_wr.wr, n_tree.p2_wr.wr, d_tree, root, n_tree.get_children()) )
