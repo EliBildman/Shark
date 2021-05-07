@@ -2,13 +2,13 @@ import pickle
 from pypokerengine.utils.card_utils import gen_cards, gen_deck, estimate_hole_card_win_rate
 from execution_time import ExecutionTime
 import matplotlib.pyplot as plt
-from WRNodes import Conn, WRNode, WRNatureNode
+from .WRNodes import Conn, WRNode, WRNatureNode
 
 e = ExecutionTime()
 
-N_NODES = 2
-N_LEVELS = 5
-N_TESTS = 10
+N_NODES = 5
+N_LEVELS = 4
+N_TESTS = 100
 
 NODE_FILE = 'D:/dev/Shark/cfr/abstraction/caches/wr_nodes.dic'
 TREE_FILE = 'D:/dev/Shark/cfr/abstraction/caches/wr_tree.dic'
@@ -38,7 +38,7 @@ def save(nodes, filename):
     pickle.dump(nodes, f)
     f.close()
 
-def load(filename):
+def load_file(filename):
     f = open(filename, 'rb')
     nodes = pickle.load(f)
     f.close()
@@ -90,7 +90,7 @@ def create_nature_tree(wr_map, save_file):
 
 def train(n_itterations, save_file, dump_nodes = False):
     if not dump_nodes:
-        nodes = load(save_file)
+        nodes = load_file(save_file)
     else:
         nodes = create_wr_map()
     for i in range(n_itterations):
@@ -107,7 +107,7 @@ def plot(node):
     plt.bar(wrs, ps)
     plt.show()
 
-if __name__ == '__main__':
-    train(100, TEST_NODES, dump_nodes=True)
-    _map = load(TEST_NODES)
-    create_nature_tree(_map, TEST_TREE)
+# if __name__ == '__main__':
+#     train(100, TEST_NODES, dump_nodes=True)
+#     _map = load_file(TEST_NODES)
+#     create_nature_tree(_map, TEST_TREE)

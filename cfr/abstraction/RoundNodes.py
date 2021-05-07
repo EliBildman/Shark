@@ -34,7 +34,7 @@ class DecisionNode():
 
         ends_round = new_state.turn >= new_state.n_players
 
-        act = Action(player, Move('call'))
+        act = Action(player, Move('call', call_amount))
 
         return DecisionNode(self, new_state, self.raise_amounts, last_action= act, round_over= ends_round)
 
@@ -57,7 +57,7 @@ class DecisionNode():
 
         new_state.turn += 1
 
-        act = Action(player, Move('riase', amount= raise_amount))
+        act = Action(player, Move('raise', amount= raise_amount))
 
         return DecisionNode(self, new_state, self.raise_amounts, last_action= act)
 
@@ -76,7 +76,7 @@ class DecisionNode():
 
         for r in self.raise_amounts:
             # print(self.gamestate.pots[self.gamestate.player] + r )
-            if self.gamestate.pots[self.gamestate.player()] + r <= self.gamestate.max_bet:
+            if self.gamestate.pots[self.gamestate.opp_player()] + r <= self.gamestate.max_bet:
                 self.children.append(self._get_raise(r))
 
         return self.children
@@ -95,6 +95,8 @@ class WRInfoSet():
         self.id = uuid.uuid1()
         self.strat = []
         self.nodes = []
+        self.regrets = []
+        self.regret_sum = 0
 
         self._init_strat(example_node)
 
@@ -116,18 +118,64 @@ class WRInfoSet():
             return False
 
         for i in range(len(self.his)):
-            if self.his[i] != n_his[i]:
+            self_node = self.his[i]
+            n_node = n_his[i]
+
+            if type(self_node.inner_node) is not type(n_node.inner_node):
                 return False
 
+            if self_node.wrs[self.player] != n_node.wrs[self.player]:
+                return False
+
+            if self_node.is_decision:                
+                if self_node.inner_node.last_action != n_node.inner_node.last_action:
+                    return False
+        
+        return True
+
+    #get prob for action in strategy
     def p_action(self, action):
         for s in self.strat:
             if s[0] == action:
                 return s[1]
+        raise Exception('bad action')
+    
+    #get all possible actions from this infoset
+    def get_actions(self):
+        acts = []
+        for s in self.strat:
+            acts.append(s[0])
+        return acts
+
+    #add to regret total and total for this action
+    def update_reret(self, action, regret):
+        if regret == 0:
+            return
+        for c_regret in self.regrets:
+            if c_regret[0] == action:
+                c_regret[1] += regret
+                self.regret_sum += regret
+                self._calc_strat()
+                return
+        raise Exception('bad action')
+
+    #assumes regret_sum is non-zero
+    def _calc_strat(self):
+        for i in range(len(self.strat)):
+            self.strat[i][1] = self.regrets[i][1] / self.regret_sum
 
     def _init_strat(self, example_node):
         children = example_node.get_children()
         for child in children:
-            self.strat.append( (child.inner_node.last_action, 1 / len(children)) )
+            self.strat.append( [child.inner_node.last_action, 1 / len(children)] ) #store strategy as touple with (Action, likelihood)
+            self.regrets.append( [child.inner_node.last_action, 0] )
+
+    def __str__(self):
+        history_str = '[ '
+        for h in self.his:
+            history_str += str(h) + ' '
+        history_str += ']'
+        return 'WRInfoSet(player: ' + str(self.player) + ', hand_wr: ' + str(self.hand_wr) + ', his: ' + history_str + ')'
 
 
 class GameState():
@@ -160,7 +208,7 @@ class Move():
         self.amount = amount
 
     def __str__(self):
-        return 'Move(name: ' + self.name + ',\tamount: ' + str(self.amount) + ')' 
+        return 'Move(name: ' + self.name + ', amount: ' + str(self.amount) + ')' 
 
 #a move made by a player
 class Action():
@@ -174,4 +222,4 @@ class Action():
         return self.player == other.player and self.move.name == other.move.name and self.move.amount == other.move.amount
 
     def __str__(self):
-        return 'Action(player: ' + str(self.player) + ',\tmove: ' + str(self.move) + ')'
+        return 'Action(player: ' + str(self.player) + ', move: ' + str(self.move) + ')'

@@ -1,12 +1,10 @@
-from WRNodes import WRNode, WRNatureNode
-from RoundNodes import DecisionNode, ValueNode, WRInfoSet
+from .WRNodes import WRNode, WRNatureNode
+from .RoundNodes import DecisionNode, ValueNode, WRInfoSet
 
 # strategy_profile = [
 #     {}, #p1 strats 
 #     {}  #p2 strats
 # ]
-
-info_sets = []
 
 # def p_action(info_set, action):
 #     if not strategy_profile[action.player][info_set.id]:
@@ -15,6 +13,8 @@ info_sets = []
 #         return strategy_profile[action.player][info_set.id][action.move.name][str(action.move.amount)]
 #     else:
 #         strategy_profile[action.player][info_set.id][action.move.name]
+
+info_sets = []
 
 #wrapper class for WRNatureNode and DecisionNode to make the tree to train on
 class AGameNode():
@@ -49,7 +49,7 @@ class AGameNode():
         if self.info_set:
             return self.info_set
 
-        for info_set in info_sets:
+        for info_set in info_sets: #look for existing info set
             if info_set.matches_node(self):
                 self.info_set = info_set
                 info_set.add_node(self)
@@ -62,8 +62,11 @@ class AGameNode():
 
         return self.info_set
 
-    def get_children(self):
-        return self.children
+    def get_children(self, i = None):
+        if i is None:
+            return self.children
+        else:
+            return self.children[i]
 
     def add_child(self, child):
         self.children.append(child)
@@ -84,6 +87,7 @@ class AGameNode():
             #calculate based on strategy profile of player at parent node, or 1.0 if parent is nature
 
     #gets move history from last nature to here
+    #if player_per only gets info for active player
     def get_history(self):
         if self.history:
             return self.history
@@ -94,7 +98,7 @@ class AGameNode():
             curr = curr.parent
         
         return self.history
-    
+
     def __str__(self):
         _type = 'nature' if self.is_nature else ('decision' if self.is_decision else 'value')
-        return 'AGameNode(wrs: ' + str(self.wrs) + ',\ttype: ' + _type + ',\tlast_action: ' + (str(self.inner_node.last_action) if not self.is_nature else 'N/A') + ')'
+        return 'AGameNode(wrs: ' + str(self.wrs) + ', type: ' + _type + ', last_action: ' + (str(self.inner_node.last_action) if not self.is_nature else 'N/A') + ')'

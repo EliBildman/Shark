@@ -1,8 +1,8 @@
-from RoundNodes import DecisionNode, GameState, ValueNode
-from WRNodes import Conn, WRNatureNode
-from AGameNode import AGameNode
-from decision_tree import build_decision_tree
-from wr_map import load, save, NODE_FILE, TREE_FILE, TEST_NODES, TEST_TREE 
+from .RoundNodes import DecisionNode, GameState, ValueNode
+from .WRNodes import Conn, WRNatureNode
+from .AGameNode import AGameNode
+from .decision_tree import build_decision_tree
+from .wr_map import load_file, save, NODE_FILE, TREE_FILE, TEST_NODES, TEST_TREE 
 
 G_TREE_FILE = 'D:/dev/Shark/abstraction/caches/game_tree.dic'
 TEST_G_TREE = 'D:/dev/Shark/abstraction/caches/t_game_tree.dic'
@@ -26,7 +26,7 @@ def create_game_tree(n_tree, d_tree, parent = None):
 
         else:
             #send back value
-            take = d_node.gamestate.pots[0] * (1 if p1_wr > p2_wr else -1) #TODO: estimated EV
+            take = d_node.gamestate.pots[0] * (1 if p1_wr > p2_wr else (-1 if p2_wr > p1_wr else 0)) #TODO: estimated EV
             v_node = ValueNode(take, d_node.last_action)
             return AGameNode( parent, v_node, [p1_wr, p2_wr] )
             # for child in leaf_children:  
